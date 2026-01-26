@@ -226,5 +226,9 @@ elif st.session_state.view == "main":
                 st.session_state.view = "login";
                 st.rerun()
     with col3:
-        if st.button("🔄 다른 메뉴"):
-            st.rerun()
+        if st.button("🔄 다른 메뉴 보기"):
+            if st.session_state.logged_in:
+                st.rerun()
+            else:
+                st.session_state.view = "login";
+                st.rerun()
