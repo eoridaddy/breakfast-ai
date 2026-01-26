@@ -5,6 +5,7 @@ import datetime
 import requests
 import random
 from pathlib import Path
+import os
 
 
 # --- 스타일 설정 (글자 크기 최적화 및 레이아웃 제어) ---
@@ -29,6 +30,7 @@ def inject_custom_css():
         .stImage > img {
             border-radius: 15px !important;
             object-fit: cover;
+            max-height: 400px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -99,6 +101,20 @@ def get_weather():
     except:
         return 20.0, "정보 없음 🌫️"
 
+# --- 이미지 경로 찾기 함수 추가 ---
+def get_local_image(menu_name):
+    # images 폴더 경로 설정
+    img_dir = "images"
+    # 지원할 확장자 목록
+    extensions = [".jpg", ".jpeg", ".png", ".webp"]
+
+    for ext in extensions:
+        img_path = os.path.join(img_dir, f"{menu_name}{ext}")
+        if os.path.exists(img_path):
+            return img_path
+
+    # 이미지가 없을 경우 보여줄 기본 이미지 (또는 None)
+    return None
 
 # --- 3. 맞춤형 SQL 추천 로직 ---
 def get_personalized_recommendation(user_id, current_weather, context, menu_df):
@@ -198,10 +214,16 @@ elif st.session_state.view == "main":
     st.write("### 🌙 AI가 추천하는 내일 아침")
 
     # Unsplash를 이용한 음식 사진 자동 매칭
-    img_url = f"https://source.unsplash.com/featured/800x450/?{recommended_item['name']},breakfast,food"
+    # --- 로컬 이미지 불러오기 적용 ---
+    img_path = get_local_image(recommended_item['name'])
 
     container = st.container(border=True)
-    container.image(img_url, use_column_width=True)
+    if img_path:
+        container.image(img_path, use_column_width=True)
+    else:
+        # 이미지가 없을 경우 안내 문구 또는 플레이스홀더
+        container.info(f"'{recommended_item['name']}' 이미지를 images 폴더에 추가해주세요.")
+
     container.markdown(f"<p class='menu-title'>{recommended_item['name']}</p>", unsafe_allow_html=True)
     container.markdown(f"<p class='sub-text'>🏷️ {recommended_item['tag']} | ⏱️ {recommended_item['time']}분 소요</p>",
                        unsafe_allow_html=True)
