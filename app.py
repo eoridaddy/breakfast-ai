@@ -155,16 +155,17 @@ def login(uid, pw):
 inject_custom_css()
 
 if st.session_state.view == "login":
-    st.title("🔐 개인 맞춤형 아침")
-    input_id = st.text_input("아이디")
-    input_pw = st.text_input("비밀번호", type="password")
+    st.title("🔐 맞춤형 추천을 시작합니다")
+    st.write("피드백을 남기거나 본인 취향을 학습시키려면 로그인해주세요.")
+    input_id = st.text_input("아이디 (기본: admin)")
+    input_pw = st.text_input("비밀번호 (기본: 1234)", type="password")
     if st.button("로그인"):
         if login(input_id, input_pw):
             st.rerun()
         else:
-            st.error("로그인 실패")
-    if st.button("홈으로"):
-        st.session_state.view = "main";
+            st.error("정보가 올바르지 않습니다.")
+    if st.button("돌아가기"):
+        st.session_state.view = "main"
         st.rerun()
 
 elif st.session_state.view == "main":
